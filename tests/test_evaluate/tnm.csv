@@ -1,0 +1,11 @@
+report_text_anon,subject,T_pre,T,N,M,V,R,L,Pn,SM,H,G,T_pre_min,T_min,N_min,M_min,V_min,R_min,L_min,Pn_min,SM_min,H_min,G_min,sha,labelled
+"Metastatic tumour from colorectal primary, T3 N0",subj-01,,3,0,,,,,,,,,,3,0,,,,,,,,,none,yes
+T1 N0 MX (colorectal cancer),subj-01,,1,0,X,,,,,,,,,1,0,X,,,,,,,,none,yes
+pT3/2/1 N0 Mx. Malignant neoplasm ascending colon,subj-01,p,3,0,X,,,,,,,,p,1,0,X,,,,,,,,none,yes
+pT2a/b N0 Mx (sigmoid tumour),subj-01,p,2b,0,X,,,,,,,,p,2a,0,X,,,,,,,,none,yes
+"T4a & b N0 M1 invasive carcinoma, descending colon",subj-01,,4b,0,1,,,,,,,,,4a,0,1,,,,,,,,none,yes
+"T1-weighted image, ... rectal tumour staged as ymrT2",subj-01,mry,2,,,,,,,,,,mry,2,,,,,,,,,,none,yes
+Colorectal tumour. Stage: T4b / T4a / T3 / T2 / T1,subj-01,,,,,,,,,,,,,,,,,,,,,,,none,yes
+"Sigmoid adenocarcinoma, ... Summary: pT1 (sigmoid, txt txt txt txt), N3b M0",subj-01,p,1,3b,0,,,,,,,,p,1,3b,0,,,,,,,,none,yes
+"Colorectal tumour in situ, Tis N0 M0",subj-01,,is,0,0,,,,,,,,,is,0,0,,,,,,,,none,yes
+TO NO MX GX,subj-01,,0,0,X,,,,,,,X,,0,0,X,,,,,,,X,none,yes
