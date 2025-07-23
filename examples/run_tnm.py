@@ -125,11 +125,10 @@ Arguments for `tnm.get_tnm_values()`:
 * `df` : Pandas dataframe that contains reports
 * `matches` : TNM phrases that were extracted for each report, output of `tnm.get_tnm_phrases()`
 * `col` : name of column in `df` that contains reports
-* `pathology_prefix` : if True, the output columns will have 'p' prefix, e.g. 'pT'
 """
 
 # Get TNM values from phrases
-df_crc, s = get_tnm_values(df_crc, matches=matches, col='report_text_anon', pathology_prefix=False)
+df_crc, s = get_tnm_values(df_crc, matches=matches, col='report_text_anon')
 
 # Column names in df after tnm values were added
 print('Columns in df_crc:')

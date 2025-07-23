@@ -1,10 +1,15 @@
 # Extracting minimal colorectal cancer information from free text reports
 
-This code repository accompanies the publication `Supporting cancer research on real-world data: Extracting colorectal cancer status and explicitly written TNM stages from free-text imaging and histopathology reports` by Tamm, Jones, Doshi, Perry et al (see below for a citation).
+This code repository accompanies the publication `Supporting cancer research on real-world data: Extracting colorectal cancer status and explicitly written TNM stages from free-text imaging and histopathology reports` by Tamm, Jones, Doshi, Perry, and others.
 
 The purpose is to provide a lightweight regex-based tool to identify clinical reports that discuss current colorectal cancer (CRC) and to extract explicitly given TNM staging scores from the reports.
 
-A license for using the code is not yet included - but a permissive license will be included in the future once the manuscript is published.
+A license for using the code is not yet included. A permissive license will be included once the manuscript is published.
+
+The release `manuscript` (https://github.com/tammandres/crc-and-tnm/releases/tag/manuscript) is a snapshot of the code that was run when evaluating the algorithms for the manuscript. The current release differs slightly, including a few small updates to the algorithms, such as a few additions to the regex patterns and ability to run the algorithms on multiple cores.
+
+Andres Tamm
+2025-07-23
 
 
 ## Installation 
@@ -34,12 +39,12 @@ matches, check_phrases, check_cleaning, check_rm = get_tnm_phrase(df=df_crc, col
                                                                   remove_falsepos=True)
 
 # Extract TNM values from phrases
-df_crc, s = get_tnm_values(df_crc, matches=matches, col='report_text_anon', pathology_prefix=False)
+df_crc, s = get_tnm_values(df_crc, matches=matches, col='report_text_anon')
 ```
 
 The functions can be run from the command line - results will be saved to `./results`.
 But the command line version has not been updated to run on multiple cores.
-```
+```bash
 # Command line help
 textmining --help
 textmining tnmphrase --help
@@ -52,10 +57,8 @@ textmining tnmphrase --data ./tests/test_cli/reports.csv --column report_text_an
 textmining tnmvalues --data ./tests/test_cli/reports.csv --column report_text_anon --additional_output 0
 ```
 
-
 There is also an R Shiny app for labelling reports for validation, in `./labeller`. This is separate from the
 main Python package, and requires additional R libraries to be usable.
-
 
 
 ## Overview of included files 
