@@ -17,8 +17,7 @@ CTX_FILE = 'context.csv'
 def get_crc_reports(df: pd.DataFrame, col: str, vocab_path: Path = VOCAB_DIR, verbose: bool = False,
                     pad_left: int = 100, pad_right: int = 100, site_dist_left: int = 100,
                     site_dist_right: int = 100, site_dist_ex_left: int = 30, site_dist_ex_right: int = 30,
-                    add_subj_to_matches: bool = False, subjcol: str = 'subject', spellcheck: bool = True,
-                    negation_bugfix: bool = False):
+                    add_subj_to_matches: bool = False, subjcol: str = 'subject', spellcheck: bool = True):
     """Identify reports that describe current colorectal cancer
 
       df: Pandas DataFrame that contains a free-text report in each row
@@ -100,7 +99,7 @@ def get_crc_reports(df: pd.DataFrame, col: str, vocab_path: Path = VOCAB_DIR, ve
         char = '.' if c == 'metastatic' else charset
         p_left = get_context_patterns(vcon, category=c, side='left', char=char, pdist=pdist, tdist=tdist, gap=gap,
                                       verbose=verbose)
-        if negation_bugfix and c is'negated':
+        if c is'negated':
             gap_shorter = r'(?:\s{,3}[\w\(\)]+){,2}\s{,3}'
             vcon1 = pd.concat(objs=[vcon.iloc[[0]], vcon.loc[vcon.category.str.startswith('stop')]], axis=0)
             p_right1 = get_context_patterns(vcon1, category=c, side='right', char=char, pdist=pdist, tdist=tdist, gap=gap_shorter,

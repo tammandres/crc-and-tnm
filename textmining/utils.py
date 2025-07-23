@@ -2,7 +2,7 @@ from textmining.constants import VOCAB_DIR
 from pathlib import Path
 from joblib import Parallel, delayed
 from difflib import SequenceMatcher
-from tqdm import tqdm
+#from tqdm import tqdm
 import pandas as pd
 import numpy as np
 import regex as re
@@ -46,7 +46,8 @@ def extract(df: pd.DataFrame, col: str = 'safe_imaging_report', pat: str = 'patt
     matches = pd.DataFrame(columns=colnames)
 
     # Loop over reports
-    for i, txt in enumerate(tqdm(reports)):
+    #for i, txt in enumerate(tqdm(reports)):
+    for i, txt in enumerate(reports):
         if txt:  # Proceed if the row is not empty
             match = re.search(pat, txt, flags=flags)
             if match:  # Proceed if any matches were found
