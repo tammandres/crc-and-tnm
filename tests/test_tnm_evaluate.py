@@ -7,7 +7,7 @@ from textmining.tnm.tnm import get_tnm_phrase, get_tnm_values
 # ==== Dummy data ====
 test_dir = PROJECT_ROOT / 'tests' / 'test_evaluate'
 test_dir.mkdir(parents=True, exist_ok=True)
-TNM_FILE = test_dir / 'tnm.csv'
+TNM_PATH = test_dir / 'tnm.csv'
 
 col = 'report_text_anon'
 reports = ['Metastatic tumour from colorectal primary, T3 N0',
@@ -24,14 +24,14 @@ reports = ['Metastatic tumour from colorectal primary, T3 N0',
 df = pd.DataFrame(reports, columns=[col])
 df['subject'] = 'subj-01'
 
-matches, __, __, check_rm = get_tnm_phrase(df, col, flex_start=False, simplicity=0)
+matches, __, __, check_rm = get_tnm_phrase(df, col, flex_start=False)
 df, submatches = get_tnm_values(df, matches, col)
 print(df[['report_text_anon', 'T', 'N', 'M']])
 
 df['labelled'] = 'yes'
-df.to_csv(TNM_FILE, index=False)
+df.to_csv(TNM_PATH, index=False)
 
 
 def test_evaluate_tnm():
     """Tests that code runs"""
-    res = evaluate_tnm(truth_path=TNM_FILE, eval_path=TNM_FILE, brc='none', split='none')
+    data = evaluate_tnm(truth_path=TNM_PATH, eval_path=TNM_PATH, split='train', brc='ouh')

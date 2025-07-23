@@ -1,4 +1,6 @@
-"""Note: cli cannot take True/False as input values, hence using 1/0 instead."""
+"""Note: cli cannot take True/False as input values, hence using 1/0 instead.
+The cli currently does not have the option to run the algorithms on parallel cores,
+even though the python functions for it are included in the repository"""
 from textmining.constants import RESULTS_DIR
 from textmining.tnm.tnm import get_tnm_phrase, get_tnm_values
 import pandas as pd

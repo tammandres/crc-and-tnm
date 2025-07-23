@@ -7,23 +7,16 @@ from sklearn.metrics import confusion_matrix
 from statsmodels.stats.proportion import proportion_confint
 from textmining.constants import RESULTS_DIR
 from textmining.reports import get_crc_reports
-from textmining.reports_20230206_negbugfix import get_crc_reports as get_crc_reports_old
 
 
-def evaluate_crc(truth_path: Path, eval_path: Path, split: str = 'train', brc: str = 'ouh', ci_method: str = 'wilson',
-                 print_errors: bool = False, older_code: bool = False):
+def evaluate_crc(truth_path: Path, eval_path: Path, split: str, brc: str, ci_method: str = 'wilson',
+                 print_errors: bool = False):
 
     # Columns to be compared
     cols = ['crc_nlp']
 
     # Load and prepare data for comparison
     df0, df1 = _prepare_data(truth_path, eval_path, cols, replace_n=True)
-
-    # If the ground truth CRC status was nan - converted to NULL by _prepare_data - drop these rows
-    # There was one report in training data where CRC status could not have been determined due to redaction
-    mask = df0.crc_nlp == 'null'
-    df0 = df0.loc[~mask]
-    df1 = df1.loc[~mask]
 
     print(df0.crc_nlp.unique(), df1.crc_nlp.unique())
     df0.crc_nlp = df0.crc_nlp.replace({'0': 'null'})
@@ -61,17 +54,14 @@ def evaluate_crc(truth_path: Path, eval_path: Path, split: str = 'train', brc: s
     # For error analysis
     mask = df0.crc_nlp != df1.crc_nlp
     cols = ['brc', 'report_type', 'report_text_anon', 'crc_nlp']
-    e0 = df0.loc[mask, cols + ['note']].rename(columns={'crc_nlp': 'crc_true'})
+    e0 = df0.loc[mask, cols].rename(columns={'crc_nlp': 'crc_true'})
     e1 = df1.loc[mask, cols].rename(columns={'crc_nlp': 'crc_pred'})
     e = e0.merge(e1, how='left')
 
     RESULTS_DIR.mkdir(exist_ok=True)
     e.to_csv(RESULTS_DIR / ('results-crc_errors' + suf), index=False)
 
-    if older_code:
-        __, m = get_crc_reports(e, 'report_text_anon', add_subj_to_matches=False, subjcol='subject')
-    else:
-        __, m = get_crc_reports_old(e, 'report_text_anon', add_subj_to_matches=False, subjcol='subject')
+    __, m = get_crc_reports(e, 'report_text_anon', add_subj_to_matches=False, subjcol='subject')
     m['phrase'] = m.left.str.lower() + m.target.str.upper() + m.right.str.lower()
     m.phrase = m.phrase.str.replace(r'\n|\r', '<n>', regex=True)
     e['row'] = np.arange(e.shape[0])

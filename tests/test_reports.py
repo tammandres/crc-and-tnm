@@ -39,14 +39,14 @@ def testpat_from_vocab_site():
                'ascending colon', 'right hemicolectomy', 'right hemicolect', 'hepatic flexure',
                'right colic flexure', 'transverse colon', 'splenic flexure', 'left colic flexure',
                'left colon', 'left hemicolon', 'descending colon', 'left hemicolectomy',
-               'sigmoid', 'mesorectal', 'anorectal', 'mesorectum', 'mesorectal', 'anal',
+               'sigmoid', 'anorectal',
                'transanal', 'colon', 'colonic', 'colonoscopy', 'colo-rectal', 'crc', 'dukes',
                'large bowel', 'large intestine', 'bowel wall', 'rectosigmoid', 'recto-sigmoid',
                'recto/sigmoid', 'kikuchi', 'haggitt', 'haggit', 'hagit']
 
     # Patterns
     v = pd.read_csv(VOCAB_DIR / 'vocab_site_and_tumour.csv')
-    vsite = v.loc[v.cui.isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 35, 39])]
+    vsite = v.loc[v.cui.isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
     print('\nSites included: {}'.format(vsite.concept.unique()))
 
     pats_site = pat_from_vocab(vsite, gap=r'\s{1,3}', verbose=False, name='sites')
@@ -70,11 +70,11 @@ def testpat_from_vocab_site():
     near_left = [s + ' ' * 9 for s in strings]
     near_right = [' ' * 9 + s for s in strings]
 
-    for string in dist_left:
+    for string in dist_left:  # None of these shoudl be detected as the target is too far on the left
         match = re.findall(site_left, string)
         assert not match
 
-    for string in dist_right:
+    for string in dist_right:  # None of these shoudl be detected as the target is too far on the right
         match = re.findall(site_right, string)
         assert not match
 
@@ -100,7 +100,7 @@ def test_get_crc_reports():
                'Sigmoid adenocarcinoma, ... Summary: pT1 (sigmoid, txt txt txt txt), N3b M0',
                'Colorectal tumour in situ, Tis N0 M0',
                'tumour in ascending colon',
-               'there is malignant new rectal neoplasm'
+               'there is malignant new rectal neoplasm',
                ]
     reports_ex = ['No colorectal tumour observed',
                   'There is no obvious malignant neoplasm',

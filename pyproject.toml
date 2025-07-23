@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "textmining"
+version = "0.0.1"
+authors = [{name="Andres Tamm"}]
+description = "Extracting minimal colorectal cancer information from free text reports"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/tammandres/crc-and-tnm"
+
+[project.scripts]
+textmining = "textmining.cli:main"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["textmining"]
+exclude = ["cli", "results", "labeller", "notebooks", "tests"]

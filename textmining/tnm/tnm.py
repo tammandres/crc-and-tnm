@@ -10,6 +10,7 @@ import pandas as pd
 import regex as re
 import warnings
 import time
+from joblib import Parallel, delayed
 #import git
 
 #try:
@@ -430,3 +431,51 @@ def _extract_val_minmax(submatches):
     p = p.merge(s[['row', 'rTNM_any']], how='left', on='row')
 
     return p
+
+
+def get_tnm_phrase_par(nchunks, njobs, df, col, **kwargs):
+    """Runs the get_tnm_phrase on parallel cores
+    Args
+        nchunks: number of chunks to divide the reports into, e.g. 4
+        njobs: number of chunks that can be processed in parallel (depends on the system)
+        df: data frame to run the extraction on
+        col: column of the data frame that contains the reports
+        **kwargs: placeholder for other arguments passed to get_tnm_phrase: see get_tnm_phrase
+    """
+    tic = time.time()
+    
+    test = df.shape[0] == df.index.nunique()
+    if not test:
+        raise ValueError("Index of df is not unique; run 'df.reset_index(drop=True)' first")
+    
+    indices = np.arange(df.shape[0])
+
+    def _process_chunk(indices):
+        dfsub = df.iloc[indices]
+        m, check_phrases, check_cleaning, check_rm = get_tnm_phrase(df=dfsub, col=col, **kwargs)
+        row_map = {i:row for i, row in enumerate(indices)}
+        m['row'] = m.row.replace(row_map)
+        if not check_rm.empty:
+            check_rm['row'] = check_rm.row.replace(row_map)
+        return m, check_phrases, check_cleaning, check_rm
+
+    if nchunks == 1:
+        out = _process_chunk(df.index)
+        out = [out]
+    else:
+        chunks = np.array_split(indices, nchunks)
+        out = Parallel(n_jobs=njobs)(delayed(_process_chunk)(indices) for indices in chunks)
+    
+    matches = pd.concat(objs=[i[0] for i in out], axis=0)
+    matches = matches.sort_values(by=['row', 'start', 'end', 'target']).reset_index(drop=True)
+
+    check_phrases = pd.concat(objs=[i[1] for i in out], axis=0).sort_values(by=['length'], ascending=False)
+    check_cleaning = pd.concat(objs=[i[2] for i in out], axis=0).sort_values(by=['length'], ascending=False)
+
+    check_rm = pd.concat(objs=[i[3] for i in out], axis=0)
+    check_rm = check_rm.sort_values(by=['row', 'start', 'end', 'target']).reset_index(drop=True)
+    
+    toc = time.time()
+    print('Time elapsed: {} minutes'.format((toc - tic) / 60))
+
+    return matches, check_phrases, check_cleaning, check_rm

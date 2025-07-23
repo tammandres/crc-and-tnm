@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import regex as re
 import time
+from joblib import Parallel, delayed
 
 
 VOCAB_FILE = 'vocab_site_and_tumour.csv'
@@ -41,7 +42,7 @@ def get_crc_reports(df: pd.DataFrame, col: str, vocab_path: Path = VOCAB_DIR, ve
     sites_ex = ['liver', 'lung', 'pelvis', 'uterus',
                 'ovaries', 'bladder',
                 'spleen', 'anastomosis', 'adrenal gland', 'kidney',
-                'bone', 'pleura', 'brain', 'head']  # not mesentery, peritoneum, small intestine, nodes
+                'bone', 'pleura', 'brain', 'head', 'prostate']  # not mesentery, peritoneum, small intestine, nodes
     vsite_ex = v.loc[v.concept.isin(sites_ex)]
     print('Sites excluded: {}'.format(vsite_ex.concept.unique()))
     vtum = v.loc[v.cui == 11]
@@ -99,23 +100,21 @@ def get_crc_reports(df: pd.DataFrame, col: str, vocab_path: Path = VOCAB_DIR, ve
         char = '.' if c == 'metastatic' else charset
         p_left = get_context_patterns(vcon, category=c, side='left', char=char, pdist=pdist, tdist=tdist, gap=gap,
                                       verbose=verbose)
-        if negation_bugfix and c is 'negated':
-
-            ## First negation pattern, ' : (no|none|negative)', requires different gap
+        if negation_bugfix and c is'negated':
             gap_shorter = r'(?:\s{,3}[\w\(\)]+){,2}\s{,3}'
             vcon1 = pd.concat(objs=[vcon.iloc[[0]], vcon.loc[vcon.category.str.startswith('stop')]], axis=0)
             p_right1 = get_context_patterns(vcon1, category=c, side='right', char=char, pdist=pdist, tdist=tdist, gap=gap_shorter,
                                             verbose=verbose, output_list=True)
-
-            ## Other negation patterns are OK    
-            vcon2 = vcon.drop(index=[0])                          
+            
+            vcon2 = vcon.drop(index=[0])
             p_right2 = get_context_patterns(vcon2, category=c, side='right', char=char, pdist=pdist, tdist=tdist, gap=gap,
                                             verbose=verbose, output_list=True)
+            
             p_right = p_right1 + p_right2
             p_right = wrap_pat(p_right)
         else:
             p_right = get_context_patterns(vcon, category=c, side='right', char=char, pdist=pdist, tdist=tdist, gap=gap,
-                                       verbose=verbose)
+                                           verbose=verbose)
         ctx_left.__setattr__(c, p_left)
         ctx_right.__setattr__(c, p_right)
 
@@ -217,3 +216,48 @@ def get_crc_reports(df: pd.DataFrame, col: str, vocab_path: Path = VOCAB_DIR, ve
     toc = time.time()
     print('Time elapsed: {} minutes'.format((toc - tic) / 60))
     return dfsub, matches
+
+
+def get_crc_reports_par(nchunks, njobs, df, col, **kwargs):
+    """Runs get_crc_reports on parallel cores
+    Args
+        nchunks: number of chunks to divide the reports into, e.g. 4
+        njobs: number of chunks that can be processed in parallel (depends on the system)
+        df: data frame to run the extraction on
+        col: column of the data frame that contains the reports
+        **kwargs: placeholder for other arguments passed to get_crc_reports: see get_crc_reports
+    """
+    tic = time.time()
+    
+    test = df.shape[0] == df.index.nunique()
+    if not test:
+        raise ValueError("Index of df is not unique; run 'df.reset_index(drop=True)' first")
+    
+    indices = np.arange(df.shape[0])
+
+    def _process_chunk(indices):
+        dfsub = df.iloc[indices]
+        __, m = get_crc_reports(df=dfsub, col=col, **kwargs)
+        row_map = {i:row for i, row in enumerate(indices)}
+        m['row'] = m.row.replace(row_map)
+        return m
+
+    if nchunks == 1:
+        out = _process_chunk(df.index)
+        out = [out]
+    else:
+        chunks = np.array_split(indices, nchunks)
+        out = Parallel(n_jobs=njobs)(delayed(_process_chunk)(indices) for indices in chunks)
+    
+    matches = pd.concat(objs=out, axis=0)
+    matches = matches.sort_values(by=['row', 'start', 'end', 'target']).reset_index(drop=True)
+
+    matches_incl = matches.loc[matches.exclusion_indicator==0]
+    df['row'] = np.arange(df.shape[0])
+    df.loc[df.row.isin(matches_incl.row), 'crc_nlp'] = 1
+    df_crc = df.loc[df.crc_nlp == 1].drop(labels='crc_nlp', axis=1)
+    
+    toc = time.time()
+    print('Time elapsed: {} minutes'.format((toc - tic) / 60))
+
+    return df_crc, matches

@@ -1,4 +1,4 @@
-from textmining.tnm.tnm import get_tnm_phrase, get_tnm_values
+from textmining.tnm.tnm import get_tnm_phrase, get_tnm_values, get_tnm_phrase_par
 import pandas as pd
 import numpy as np
 
@@ -14,7 +14,10 @@ def test_get_tnm_phrase():
                'Colorectal tumour. Stage: T4b / T4a / T3 / T2 / T1',
                'Sigmoid adenocarcinoma, ... Summary: pT1 (sigmoid, txt txt txt txt), N3b M0',
                'Colorectal tumour in situ, Tis N0 M0',
-               'stageT1 N0 M0'
+               'stageT1 N0 M0',
+               'stage pT0/pT1',  # Does not work fully, pT0/ (after split) is lost to cleaning
+               'stage PN0',  # Lost to cleaning
+               'T0 ?N0 ?M0'  # question mark leads to failed detection
                ]
     df = pd.DataFrame(reports, columns=[col])
 
@@ -28,6 +31,45 @@ def test_get_tnm_phrase():
 
     matches, __, __, __ = get_tnm_phrase(df, col, simplicity=2, remove_historical=False, flex_start=False)
     print(matches[['target_before_clean', 'target']])
+
+
+def test_get_tnm_phrase_par():
+    col = 'report_text_anon'
+    reports = ['Metastatic tumour from colorectal primary, T3 N0',
+               'T1 N0 MX (colorectal cancer), other tumour is T2 N1 MX',
+               'pT3/2/1 N0 Mx. Malignant neoplasm ascending colon',
+               'pT2a/b N0 Mx (sigmoid tumour)',
+               'T4a & b N0 M1 invasive carcinoma, descending colon',
+               'T1-weighted image, ... rectal tumour staged as ymrT2',
+               'Colorectal tumour. Stage: T4b / T4a / T3 / T2 / T1',
+               'Sigmoid adenocarcinoma, ... Summary: pT1 (sigmoid, txt txt txt txt), N3b M0',
+               'Colorectal tumour in situ, Tis N0 M0',
+               'stageT1 N0 M0',
+               'stage pT0/pT1',  # Does not work fully, pT0/ (after split) is lost to cleaning
+               'stage PN0',  # Lost to cleaning
+               'T0 ?N0 ?M0'  # question mark leads to failed detection
+               ]
+    df = pd.DataFrame(reports, columns=[col])
+
+    matches, check_phrases, check_cleaning, check_rm = get_tnm_phrase(df=df, col=col, simplicity=2, remove_historical=False, flex_start=False)
+    print(matches[['target_before_clean', 'target']])
+
+    ## Use 'copy', as otherwise 'tmp_row' will be added
+    matches_par, check_phrases_par, check_cleaning_par, check_rm_par = \
+        get_tnm_phrase_par(nchunks=4, njobs=4, df=df, col=col, simplicity=2, remove_historical=False, flex_start=False)
+    print(matches_par[['target_before_clean', 'target']])
+    test = matches.fillna(0).values == matches_par.drop(labels='tmp_row', axis=1).fillna(0)
+    assert test.all().all()
+
+    test = check_rm.sort_values(by=['row', 'start']).fillna(0).values == check_rm_par.sort_values(by=['row', 'start']).fillna(0).values
+    assert test.all().all()
+
+    test = check_phrases.sort_values(by=['length']).fillna(0).values == check_phrases_par.sort_values(by=['length']).fillna(0).values
+    assert test.all().all()
+
+    test = check_cleaning.sort_values(by=['length', 'target_before_clean']).fillna(0).values == \
+        check_cleaning_par.sort_values(by=['length', 'target_before_clean']).fillna(0).values
+    assert test.all().all()
 
 
 def test_get_tnm_phrase_simplicity():

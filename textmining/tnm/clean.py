@@ -1,7 +1,7 @@
 from textmining.constants import VOCAB_DIR
 from textmining.reports import get_crc_reports
 from textmining.tnm.pattern import _tnm_value
-from textmining.utils import extract, extract_set, process, get_sentence, get_context_patterns, wrap_pat
+from textmining.utils import extract, extract_set, process, get_sentence, get_context_patterns, wrap_pat, constrain
 from dataclasses import asdict
 import pandas as pd
 import numpy as np

@@ -96,8 +96,7 @@ def tnm_phrase(df: pd.DataFrame, col='report', gapsize: int = 100, pad_left: int
     matches = get_sentence(matches)
 
     # Rank matches based on position in the pathology report (earlier matches have smaller ranks)
-    ranks = matches.groupby(['row'], as_index=False)['start'].rank().rename(columns={'start': 'rank'})
-    matches = matches.merge(ranks, how='left', left_index=True, right_index=True)
+    matches['rank'] = matches.groupby('row')['start'].rank(method='first').values
 
     toc = time.time()
     print('Time elapsed: {:.2f} minutes'.format((toc - tic) / 60))

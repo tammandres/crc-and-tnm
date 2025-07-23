@@ -25,7 +25,7 @@ df.to_csv(TEST_DIR / 'reports.csv', index=False)
 
 # Then to terminal:
 """
-textmining tnmphrase --data ./tests/test_cli/reports.csv --column report_text_anon --remove_historical 1
+textmining tnmphrase --data ./tests/test_cli/reports.csv --column report_text_anon --remove_historical 0
 textmining tnmvalues --data ./tests/test_cli/reports.csv --column report_text_anon --additional_output 0
 textmining tnmvalues --data ./tests/test_cli/reports.csv --column report_text_anon --additional_output 1
 """
