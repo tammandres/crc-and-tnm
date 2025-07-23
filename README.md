@@ -1,4 +1,4 @@
-# Extracting minimal colorectal cancer information from free text reports
+# Extracting colorectal cancer status and explicit TNM staging from free text reports
 
 This code repository accompanies the publication `Supporting cancer research on real-world data: Extracting colorectal cancer status and explicitly written TNM stages from free-text imaging and histopathology reports` by Tamm, Jones, Doshi, Perry, and others.
 
