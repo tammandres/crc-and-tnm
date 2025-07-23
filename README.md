@@ -30,7 +30,7 @@ See `run_tnm.ipynb` and `run_tnm.py` in `./examples` for a thorough example.
 A brief example code is provided below:
 ```python
 # Find reports that describe current colorectal cancer
-df_crc, matches_crc = get_crc_reports(df, col='report_text_anon', add_subj_to_matches=True, subjcol='subject')
+df_crc, matches_crc = get_crc_reports(df, col='report_text_anon')
 
 # Extract TNM phrases
 matches, check_phrases, check_cleaning, check_rm = get_tnm_phrase(df=df_crc, col='report_text_anon', 
