@@ -25,7 +25,7 @@ pip install -e .
 * The function `textmining.reports.get_crc_reports` can be used to identify clinical reports that discuss current colorectal cancer. 
 * The functions `textmining.tnm.tnm.get_tnm_phrase` and `textmining.tnm.tnm.get_tnm_values` can be used to extract the TNM scores given in letters and numbers. The `get_tnm_phrase` extracts all phrases that contain TNM scores, and the `get_tnm_values` extracts the maximum and minimum values for each TNM category from these phrases.
 
-See `run_tnm.ipynb` and `run_tnm.py` in `./examples` for a thorough example. 
+See `run_tnm.ipynb` and `run_tnm.py` in `./examples` for a thorough example, especially https://github.com/tammandres/crc-and-tnm/blob/main/examples/run_tnm.ipynb.
 
 A brief example code is provided below:
 ```python
