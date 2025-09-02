@@ -99,7 +99,7 @@ def get_crc_reports(df: pd.DataFrame, col: str, vocab_path: Path = VOCAB_DIR, ve
         char = '.' if c == 'metastatic' else charset
         p_left = get_context_patterns(vcon, category=c, side='left', char=char, pdist=pdist, tdist=tdist, gap=gap,
                                       verbose=verbose)
-        if c is'negated':
+        if c is 'negated':
             gap_shorter = r'(?:\s{,3}[\w\(\)]+){,2}\s{,3}'
             vcon1 = pd.concat(objs=[vcon.iloc[[0]], vcon.loc[vcon.category.str.startswith('stop')]], axis=0)
             p_right1 = get_context_patterns(vcon1, category=c, side='right', char=char, pdist=pdist, tdist=tdist, gap=gap_shorter,
