@@ -64,18 +64,18 @@ main Python package, and requires additional R libraries to be usable.
 
 See `./files.md` for a more detailed overview of files.
 
-./examples : example scripts for how the code can be run
+`./examples` : example scripts for how the code can be run
 
-./labeller : R Shiny apps used for annotating clinical reports
+`./labeller` : R Shiny apps used for annotating clinical reports
 
-./notebooks : code that was used to select clinical reports for evaluation
+`./notebooks` : code that was used to select clinical reports for evaluation
 
-./runs : code that was run to evaluate the algorithms for the manuscript
+`./runs` : code that was run to evaluate the algorithms for the manuscript
 
-./tests : various test to help ensure that the algorithms work as intended
+`./tests` : various test to help ensure that the algorithms work as intended
 
-./textmining/tnm : code for extracting TNM staging
+`./textmining/tnm` : code for extracting TNM staging
 
-./textmining/vocab : some patterns and keywords used by the algorithms
+`./textmining/vocab` : some patterns and keywords used by the algorithms
 
-./textmining : other scripts, including code for identifying reports that describe current CRC
+`./textmining` : other scripts, including code for identifying reports that describe current CRC
