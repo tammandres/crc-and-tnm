@@ -7,7 +7,8 @@ The purpose is to provide a lightweight regex-based tool to identify clinical re
 The release `manuscript` (https://github.com/tammandres/crc-and-tnm/releases/tag/manuscript) is a snapshot of the code that was run when evaluating the algorithms for the manuscript. The current release differs slightly, including a few small updates to the algorithms, such as a few additions to the regex patterns and ability to run the algorithms on multiple cores.
 
 Andres Tamm
-2025-07-23
+
+2025-09-02
 
 
 ## Installation 
